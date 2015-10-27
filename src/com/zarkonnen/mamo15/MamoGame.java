@@ -272,27 +272,40 @@ public class MamoGame implements Game {
 
 	@Override
 	public void input(Input in) {
+		in.setCursorVisible(false);
+
+		if (in.keyPressed("ESCAPE")) {
+			in.quit();
+		}
+		
+		if (!sized) {
+			if (in.keyPressed("1")) {
+				ScreenMode sm = new ScreenMode(800, 600, false);
+				for (ScreenMode m : in.modes()) {
+					if ((m.width > sm.width || m.height > sm.height) && m.width >= 800 && m.height >= 600 && m.fullscreen) {
+						sm = m;
+					}
+				}
+				in.setMode(sm);
+				sized = true;
+			}
+			if (in.keyPressed("2")) {
+				in.setMode(new ScreenMode(800, 600, true));
+				sized = true;
+			}
+			if (in.keyPressed("3")) {
+				in.setMode(new ScreenMode(800, 600, false));
+				sized = true;
+			}
+			
+			return;
+		}
+		
 		time += in.msDelta();
 		repeat -= in.msDelta();
 		msgDecay -= in.msDelta();
 		intro -= in.msDelta();
 		relight += in.msDelta();
-		
-		if (!sized) {
-			ScreenMode sm = new ScreenMode(800, 600, false);
-			for (ScreenMode m : in.modes()) {
-				if ((m.width > sm.width || m.height > sm.height) && m.width >= 800 && m.height >= 600 && m.fullscreen) {
-					sm = m;
-				}
-			}
-			in.setMode(sm);
-			in.setCursorVisible(false);
-			sized = true;
-		}
-		
-		if (in.keyPressed("ESCAPE")) {
-			in.quit();
-		}
 		
 		if (intro > 0) {
 			return;
@@ -468,6 +481,12 @@ public class MamoGame implements Game {
 		Draw d = new Draw(f);
 		ScreenMode sm = f.mode();
 		d.rect(RED, 0, 0, sm.width, sm.height);
+		
+		if (!sized) {
+			d.text("[e1df7e]1: Max screen resolution\n2: 800x600 fullscreen\n3: 800x600 windowed\nEscape: Exit", OTTO, 10, 10);
+			return;
+		}
+		
 		d.shift(sm.width / 2 - 400, sm.height / 2 - 300);
 		if (death) {
 			if (deathAmt > 500) {
