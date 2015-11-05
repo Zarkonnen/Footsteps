@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package com.zarkonnen.mamo15;
 
 import com.zarkonnen.catengine.Draw;
@@ -322,6 +316,7 @@ public class MamoGame implements Game {
 		}
 		
 		if (dayTime > 190) {
+			msg("The darkness\ncloses in\naround you.");
 			death = true;
 			return;
 		}
@@ -370,6 +365,26 @@ public class MamoGame implements Game {
 		hasMoved = true;
 		Tile t2 = map[py + dy][px + dx];
 		repeat = 150;
+		switch (t2.type) {
+			case fire:
+			case house:
+			case wood:
+			case tree:
+			case bigtree:
+				if (hasWood && map[py - dy][px - dx].type == TileType.ground) {
+					map[py][px].type = TileType.wood;
+					px -= dx;
+					py -= dy;
+					hasWood = false;
+					if (!depositedWood) {
+						msg("You deposit a pile\nof firewood.");
+						depositedWood = true;
+					}
+					dayTime++;
+					return;
+				 }
+				 break;
+		}
 		switch (t2.type) {
 			case ground:
 				px += dx;
@@ -442,17 +457,6 @@ public class MamoGame implements Game {
 				}
 				break;
 			case fire:
-				 if (hasWood && map[py - dy][px - dx].type == TileType.ground) {
-					map[py][px].type = TileType.wood;
-					px -= dx;
-					py -= dy;
-					hasWood = false;
-					if (!depositedWood) {
-						msg("You deposit a pile\nof firewood.");
-						depositedWood = true;
-					}
-					dayTime++;
-				 }
 				 break;
 			case house:
 				if (dayTime > 120) {
